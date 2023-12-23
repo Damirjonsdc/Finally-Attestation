@@ -1,0 +1,81 @@
+8) Создание таблиц с иерархией из диаграммы БД:
+CREATE TABLE Animal (
+    AnimalID INT AUTO_INCREMENT PRIMARY KEY,
+    AnimalType VARCHAR(50),
+    Name VARCHAR(50),
+    BirthDate DATE
+);
+
+CREATE TABLE DomesticAnimal (
+    DomesticID INT AUTO_INCREMENT PRIMARY KEY,
+    AnimalID INT,
+    DomesticType VARCHAR(50),
+    FOREIGN KEY (AnimalID) REFERENCES Animal(AnimalID)
+);
+
+CREATE TABLE Dog (
+    DogID INT AUTO_INCREMENT PRIMARY KEY,
+    DomesticID INT,
+    Breed VARCHAR(50),
+    FOREIGN KEY (DomesticID) REFERENCES DomesticAnimal(DomesticID)
+);
+
+CREATE TABLE Cat (
+    CatID INT AUTO_INCREMENT PRIMARY KEY,
+    DomesticID INT,
+    FurColor VARCHAR(50),
+    FOREIGN KEY (DomesticID) REFERENCES DomesticAnimal(DomesticID)
+);
+
+CREATE TABLE WorkingAnimal (
+    WorkingID INT AUTO_INCREMENT PRIMARY KEY,
+    AnimalID INT,
+    WorkingType VARCHAR(50),
+    FOREIGN KEY (AnimalID) REFERENCES Animal(AnimalID)
+);
+
+CREATE TABLE Horse (
+    HorseID INT AUTO_INCREMENT PRIMARY KEY,
+    WorkingID INT,
+    HorseType VARCHAR(50),
+    FOREIGN KEY (WorkingID) REFERENCES WorkingAnimal(WorkingID)
+);
+
+CREATE TABLE Camel (
+    CamelID INT AUTO_INCREMENT PRIMARY KEY,
+    WorkingID INT,
+    CamelType VARCHAR(50),
+    FOREIGN KEY (WorkingID) REFERENCES WorkingAnimal(WorkingID)
+);
+9)Заполнение таблиц данными:
+INSERT INTO Animal (AnimalType, Name, BirthDate) VALUES
+    ('Domestic', 'Rex', '2019-01-15'),
+    ('Domestic', 'Whiskers', '2020-03-20'),
+    ('Working', 'Thunder', '2018-07-10'),
+    ('Working', 'Sandy', '2017-05-25');
+
+
+10)Удаление верблюдов и объединение таблиц лошадей и ослов:
+DELETE FROM Camel WHERE CamelType = 'Верблюд'; -- Удаление верблюдов
+
+CREATE TABLE HorsesAndDonkeys LIKE Horse; -- Создание новой таблицы
+
+INSERT INTO HorsesAndDonkeys (HorseType, WorkingID)
+    SELECT HorseType, WorkingID FROM Horse
+    UNION
+    SELECT CamelType, WorkingID FROM Camel WHERE CamelType IN ('Лошадь', 'Осел');
+
+DROP TABLE Horse; -- Удаление таблицы лошадей
+DROP TABLE Camel; -- Удаление таблицы верблюдов
+11) Создание новой таблицы "молодые животные":
+CREATE TABLE YoungAnimals AS
+SELECT * FROM Animal
+WHERE BirthDate BETWEEN DATE_SUB(NOW(), INTERVAL 3 YEAR) AND DATE_SUB(NOW(), INTERVAL 1 YEAR);
+12)Объединение всех таблиц в одну:
+SELECT * FROM Animal
+UNION
+SELECT * FROM DomesticAnimal
+UNION
+SELECT * FROM Dog
+
+
